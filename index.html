@@ -1,0 +1,163 @@
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet"
+        href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.12/angular-material.min.css">
+</head>
+
+<body ng-app="App">
+    <div ng-controller="CalculatorController" class="md-padding container" ng-cloak>
+        <h1 class="text-center">Preiskalkulation</h1>
+        <md-divider></md-divider><br><br>
+
+        <table>
+            <tr>
+                <td>Die Nutzfläche des Hauses in m²</td>
+                <td>
+                    <md-slider ng-change="calculate()" ng-model="areaRange" md-discrete step="{{step}}"
+                        min="{{minArea}}" max="{{maxArea}}">
+                    </md-slider>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Der Dachtyp</td>
+                <td>
+                    <md-select ng-change="calculate()" ng-model="roofTypeSelect">
+                        <md-option selected ng-value="1390"><img src="assets/satteldach.png"> Satteldach</md-option>
+                        <md-option ng-value="1410"><img src="assets/flachdach.jpg"> modernes Flachdach</md-option>
+                        <md-option ng-value="1430"><img src="assets/walmdach.png"> Walmdach</md-option>
+                        <md-option ng-value="1350"><img src="assets/putldach.png"> Putldach</md-option>
+                    </md-select>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Aluminiumfenster</td>
+                <td>
+                    <md-switch ng-change="calculate()" md-invert ng-model="aluminumWindowsCb"></md-switch>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Schlüsselfertiges Haus</td>
+                <td>
+                    <md-switch ng-change="calculate()" md-invert ng-model="readyHouseCb"></md-switch>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Wärmepumpe (+ {{heatPumpPrice|currency:'€'}})</td>
+                <td>
+                    <md-switch ng-change="calculate()" md-invert ng-model="heatPumpCb"></md-switch>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Ruckwärmegewinnung (+ {{heatRecoveryPrice|currency: '€'}})</td>
+                <td>
+                    <md-switch ng-change="calculate()" md-invert ng-model="heatRecoveryCb"></md-switch>
+                </td>
+            </tr>
+        </table>
+
+        <md-divider></md-divider>
+        <p class="text-center">Preis: {{result | currency:'€'}}</p>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular-messages.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.12/angular-material.min.js"></script>
+
+    <script type="text/javascript">
+        angular.module('App', ['ngMaterial', 'ngMessages'])
+            .config(function ($mdThemingProvider) {
+                $mdThemingProvider.theme('default')
+                    .primaryPalette('light-blue')
+                    .accentPalette('light-blue');
+            })
+            .controller('CalculatorController', function ($scope) {
+                $scope.extraPricePerSqm = 138;
+                $scope.minArea = 90;
+                $scope.maxArea = 500;
+                $scope.step = 10;
+                $scope.heatPumpPrice = 10748;
+                $scope.heatRecoveryPrice = 6598;
+
+                $scope.areaRange = $scope.maxArea;
+                $scope.roofTypeSelect;
+                $scope.aluminumWindowsCb;
+                $scope.readyHouseCb;
+                $scope.heatPumpCb;
+                $scope.heatRecoveryCb;
+                $scope.result;
+
+                $scope.calculate = () => {
+                    console.log($scope.areaRange);
+
+                    let price = 0;
+                    price += $scope.roofTypeSelect * $scope.areaRange;
+
+                    if ($scope.aluminumWindowsCb) {
+                        price += $scope.extraPricePerSqm * $scope.areaRange;
+                    }
+
+                    if ($scope.readyHouseCb) {
+                        price += $scope.extraPricePerSqm * $scope.areaRange;
+                    }
+
+                    if ($scope.heatPumpCb) {
+                        price += $scope.heatPumpPrice;
+                    }
+
+                    if ($scope.heatRecoveryCb) {
+                        price += $scope.heatRecoveryPrice;
+                    }
+
+                    $scope.result = price;
+                }
+            });
+    </script>
+
+    <style>
+        md-slider[md-discrete] .md-sign,
+        md-slider[md-discrete] .md-sign:after {
+            opacity: 1;
+            -webkit-transform: translate3d(0, 0, 0) scale(1);
+            transform: translate3d(0, 0, 0) scale(1);
+        }
+
+        table {
+            width: 100%;
+            border-spacing: 20px;
+        }
+
+        .container {
+            width: 65%;
+            margin: 0 auto;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        tr td:first-child {
+            width: 30%;
+            text-align: right;
+        }
+
+        td td:nth-child(2) {
+            width: 70%;
+        }
+
+        img {
+            vertical-align: middle;
+            margin-right: 20px;
+        }
+    </style>
+</body>
+
+</html>
